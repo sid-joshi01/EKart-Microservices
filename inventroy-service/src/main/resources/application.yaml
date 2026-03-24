@@ -1,0 +1,62 @@
+server:
+  port: 8084
+
+
+spring:
+  application:
+    name: inventory-service
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          secret-key: ${JWT_SECRET}
+
+  eureka:
+    instances:
+      prefer-ip-address: true
+    client:
+      fetch-registry: true
+      service-url:
+        defaultZone: http://localhost:8761/eureka
+
+
+  docker:
+    compose:
+      enable: false
+      lifecycle-management: start-and-stop
+
+  datasource:
+    url: jdbc:mysql://localhost:3308/ekartInventorydb?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false
+    username: ekart_user_inventory
+    password: ekart_pass_inventory
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: inventory-group
+      auto-offset-reset: earliest
+
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+
+      properties:
+        spring.deserializer.key.delegate.class: org.apache.kafka.common.serialization.StringDeserializer
+        spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JsonDeserializer
+
+        spring.json.trusted.packages: "*"
+        spring.json.use.type.headers: false
+        spring.json.value.default.type: com.ekart.inventroy.event.OrderPlacedEvent
+
+jwt:
+  secret: ${JWT_SECRET}

@@ -1,0 +1,28 @@
+services:
+  payment-db:
+    image: mysql:8.4
+    container_name: ekart-payment-db
+    command: --mysql-native-password=ON
+    ports:
+      - "3309:3306"
+    environment:
+      # Automatically creates the database on startup
+      - MYSQL_DATABASE=ekart_paymentdb
+      # Root password for admin access
+      - MYSQL_ROOT_PASSWORD=root
+      # Dedicated app user for the Spring Boot service
+      - MYSQL_USER=ekart_user_pay
+      - MYSQL_PASSWORD=ekart_pass_pay
+
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+
+    volumes:
+      - payment_data:/var/lib/mysql
+
+volumes:
+  payment_data:

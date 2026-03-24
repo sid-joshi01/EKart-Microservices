@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Payment Successful</title>
+  <style>
+    body { font-family: 'Segoe UI', sans-serif; text-align: center; padding: 50px; background-color: #f8fff9; }
+    .card { background: white; padding: 40px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); display: inline-block; }
+    .check-icon { font-size: 50px; color: #27ae60; }
+    .btn { display: inline-block; margin-top: 20px; padding: 10px 20px; background: #3399cc; color: white; text-decoration: none; border-radius: 5px; }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <div class="check-icon">✔</div>
+  <h1>Payment Successful!</h1>
+  <p>Your transaction was completed successfully.</p>
+
+  <div style="background: #f0f0f0; padding: 10px; border-radius: 5px; margin: 20px 0;">
+    <p id="orderId">Order ID: Loading...</p>
+    <p id="paymentMethod" style="font-size: 0.9rem; color: #666;"></p>
+  </div>
+
+  <a href="/my-orders.html" class="btn">View My Orders</a>
+</div>
+
+<script>
+  const urlParams = new URLSearchParams(window.location.search);
+  const orderId = urlParams.get('orderId');
+<!--  const method = urlParams.get('method'); // Capture the method if passed-->
+
+  if (orderId) {
+      document.getElementById('orderId').textContent = "Order ID: " + orderId;
+  }
+
+<!--  if (method) {-->
+<!--      document.getElementById('paymentMethod').textContent = "Paid via: " + method.toUpperCase();-->
+<!--  }-->
+</script>
+</body>
+</html>

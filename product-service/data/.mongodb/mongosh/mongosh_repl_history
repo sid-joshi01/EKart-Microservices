@@ -1,0 +1,7 @@
+db.products.insertOne({ test: "ok" })
+use product-service
+db.test.insertOne({ ok: true })
+use product-service
+db.runCommand({ connectionStatus: 1 })
+show db
+db.createUser({ user: "root", pwd: "password", roles: [{ role: 'root', db: "admin" }] })

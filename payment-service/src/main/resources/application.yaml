@@ -1,0 +1,63 @@
+spring:
+  application:
+    name: payment-service
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          secret-key: ${JWT_SECRET}
+
+  docker:
+    compose:
+      lifecycle-management: start-and-stop
+
+  datasource:
+    url: jdbc:mysql://localhost:3309/ekart_paymentdb?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false
+    username: ekart_user_pay
+    password: ekart_pass_pay
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    # Bypass auto-detection
+    database-platform: org.hibernate.dialect.MySQLDialect
+
+    # Optional: prevent Hibernate from trying to read JDBC metadata early
+    properties:
+      temp:
+        use_jdbc_metadata_defaults: false
+    hibernate:
+      ddl-auto: update   # VERY IMPORTANT
+    show-sql: true
+
+  eureka:
+    instances:
+      prefer-ip-address: true
+    client:
+      fetch-registry: true
+      service-url:
+        defaultZone: http://localhost:8761/eureka
+
+
+razorpay:
+  api:
+    key: ${RAZORPAY_KEY}
+    secret: ${RAZORPAY_SECRET}
+  webhook-secret: mySuperSecretWebhookKey123!
+
+
+
+
+server:
+  port: 8086
+
+orders:
+  service:
+    url: http://localhost:8083
+
+inventory:
+  service:
+    url: http://localhost:8084
+
+jwt:
+  secret: ${JWT_SECRET}

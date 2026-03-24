@@ -1,0 +1,57 @@
+server:
+  port: 8081
+  # This is the "Base URL" fix. It tells Spring to use the
+  # Gateway's host/port when generating the redirect_uri.
+  forward-headers-strategy: framework
+
+eureka:
+  instances:
+    prefer-ip-address: true
+  client:
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+app:
+  jwt:
+    secret: ${JWT_SECRET}
+    expiration: ${JWT_EXP}
+
+
+spring:
+  application:
+    name: USER-SERVICE
+
+  docker:
+    compose:
+      enable: true
+      lifecycle-management: start-and-stop
+
+  datasource:
+    url: jdbc:mysql://localhost:3310/ekart_usersdb?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false
+    username: ekart_user
+    password: ekart_pass
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+    show-sql: true
+
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            # Use the placeholder so Spring handles the port/host automatically
+            redirect-uri: "{baseUrl}/login/oauth2/code/google"
+
+
+#  docker exec -it ekart-user-db mysql -u root -p

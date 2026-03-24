@@ -1,0 +1,92 @@
+server:
+  port: 8083
+
+spring:
+  application:
+    name: order-service
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          secret-key: ${JWT_SECRET}
+
+  eureka:
+    instances:
+      prefer-ip-address: true
+    client:
+      fetch-registry: true
+      service-url:
+        defaultZone: http://localhost:8761/eureka
+
+  docker:
+    compose:
+      enable: true
+      lifecycle-management: start-and-stop
+
+  datasource:
+    url: jdbc:mysql://localhost:3307/ekart_orderdb?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false
+    username: ekart_user
+    password: ekart_pass
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+    show-sql: true
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.add.type.headers: false # Prevents class path issues between microservices
+
+
+management:
+  health:
+    circuitbreakers:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: always
+
+reselience4j:
+  circuitbreaker:
+    instances:
+      orderService:
+        registerHealthIndicator: true
+        eventConsumerBufferSize: 10
+        failureRateThreshold: 50
+        minimumNumberOfCalls: 5
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        waitDurationInOpenState: 5s
+        permittedNumberOfCallsInHalfOpenState: 3
+        slidingWindowSize: 10
+        slidingWindowType: COUNT_BASED
+
+
+
+
+inventory:
+  url: http://localhost:8084
+
+cart:
+  url: http:localhost:8085
+
+jwt:
+  secret: ${JWT_SECRET}
+
+
+
+

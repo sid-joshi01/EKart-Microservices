@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - EKart</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f7f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .login-card {
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            text-align: center;
+            width: 100%;
+            max-width: 380px;
+        }
+        h1 { font-size: 24px; color: #333; margin-bottom: 10px; }
+        p { color: #666; margin-bottom: 30px; }
+
+        /* Google Button Styling */
+        .google-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #ffffff;
+            border: 1px solid #dadce0;
+            color: #3c4043;
+            padding: 10px 24px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: background-color .2s, box-shadow .2s;
+            cursor: pointer;
+        }
+        .google-btn:hover {
+            background-color: #f8f9fa;
+            box-shadow: 0 1px 3px rgba(60,64,67,0.3);
+        }
+        .google-icon {
+            width: 18px;
+            height: 18px;
+            margin-right: 12px;
+        }
+        .divider {
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            color: #aaa;
+            font-size: 12px;
+        }
+        .divider::before, .divider::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: #eee;
+        }
+        .divider span { padding: 0 10px; }
+    </style>
+</head>
+<body>
+
+<div class="login-card">
+    <h1>Welcome to EKart</h1>
+    <p>Sign in to continue to your account</p>
+
+    <a href="http://localhost:8080/oauth2/authorization/google" class="google-btn">
+        <img class="google-icon" src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_Logo.svg" alt="Google Logo">
+        <span>Continue with Google</span>
+    </a>
+
+    <div class="divider"><span>OR</span></div>
+
+    <p style="font-size: 13px;">New here? <a href="#" style="color: #1a73e8; text-decoration: none;">Create an account</a></p>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Razorpay Integration (Callback URL)</title>
+    <style>
+        body { font-family: sans-serif; display: flex; justify-content: center; padding: 50px; background-color: #f4f4f4; }
+        .payment-card { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
+        .detail-row { margin-bottom: 15px; font-size: 1.1rem; }
+        .label { color: #666; font-size: 0.9rem; display: block; }
+        .value { font-weight: bold; color: #333; }
+        #amountDisplay { color: #2ecc71; font-size: 1.5rem; }
+        button { width: 100%; padding: 12px; background: #3399cc; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 1rem; transition: background 0.3s; }
+        button:hover { background: #287a9e; }
+        button:disabled { background: #ccc; cursor: not-allowed; }
+    </style>
+</head>
+
+<body>
+<!--<form id="paymentForm">-->
+<!--    <div>Amount (INR): <strong>₹ <span id="amountDisplay">0.00</span></strong></div>-->
+
+<!--    <div>Order ID: <span id="displayOrderId">Loading...</span></div>-->
+
+<!--    <button type="button" onclick="makePayment()">Pay Now</button>-->
+<!--</form>-->
+
+    <div class="payment-card">
+        <h2>Checkout</h2>
+        <hr>
+        <div class="detail-row">
+            <span class="label">Order ID:</span>
+            <span id="displayOrderId" class="value">Loading...</span>
+        </div>
+
+        <div class="detail-row">
+            <span class="label">Amount to Pay:</span>
+            <span class="value">₹ <span id="amountDisplay">0.00</span></span>
+        </div>
+
+        <button id="payButton" onclick="makePayment()" disabled>Pay Now</button>
+    </div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+
+    // 1. Get Order ID from URL (?orderId=ORD_101)
+    const urlParams = new URLSearchParams(window.location.search);
+    const orderIdFromUrl = urlParams.get('orderId');
+
+    let verifiedAmount = 0;
+
+    // 2. Fetch data from backend as soon as page loads
+    window.onload = async function() {
+        if (!orderIdFromUrl) {
+            alert("No Order ID found in URL. Please go back to the cart.");
+            return;
+        }
+
+        document.getElementById('displayOrderId').innerText = orderIdFromUrl;
+
+        try {
+            // Call your @GetMapping("/total-amount") endpoint
+            const response = await fetch(`http://localhost:8086/api/payments/amount?orderId=${orderIdFromUrl}`);
+
+            console.log(response);
+
+            if (!response.ok) throw new Error("Could not find order details");
+
+            const amount = await response.json();
+
+            // Update UI
+            verifiedAmount = amount;
+            document.getElementById('amountDisplay').innerText = amount.toFixed(2);
+
+            // Enable button now that we have the price
+            document.getElementById('payButton').disabled = false;
+
+        } catch (error) {
+            console.error("Initialization error:", error);
+            document.getElementById('amountDisplay').innerText = "Error";
+            alert("Failed to load order details. Please refresh the page.");
+        }
+    };
+
+    async function makePayment() {
+
+        const payButton = document.getElementById('payButton');
+        payButton.innerText = "Processing...";
+        payButton.disabled = true;
+
+        try{
+            // Create Razorpay Order in Backend
+            const response = await fetch('http://localhost:8086/api/payments/create-order', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    orderId: orderIdFromUrl,
+                    amount: verifiedAmount
+                })
+            });
+
+            if (!response.ok) throw new Error("Failed to create Razorpay order");
+
+            const orderData = await response.json();
+
+            // 4. Open Razorpay Modal
+            const options = {
+                "key": "rzp_test_SEqaOe8WvJhQJq", // Replace with your actual Test Key
+                "amount": orderData.amount,      // Amount in paise from backend
+                "currency": "INR",
+                "name": "E-Kart Payment",
+                "description": `Payment for Order ${orderIdFromUrl}`,
+                "order_id": orderData.gatewayPaymentId,
+                "callback_url": "http://localhost:8086/api/payments/payment-callback", // Backend endpoint
+                "prefill": {
+                    "name": "Customer Name",
+                    "email": "customer@example.com",
+                    "contact": "9999999999"
+                },
+                "theme": { "color": "#3399cc" }
+            };
+
+            const rzp1 = new Razorpay(options);
+
+            rzp1.on('payment.failed', function (response){
+                alert("Payment Failed: " + response.error.description);
+                payButton.innerText = "Retry Payment";
+                payButton.disabled = false;
+            });
+
+            rzp1.open();
+        }catch (error) {
+            console.error("Payment Error:", error);
+            alert("Error: " + error.message);
+            payButton.innerText = "Pay Now";
+            payButton.disabled = false;
+        }
+
+
+    }
+</script>
+</body>
+
+</html>

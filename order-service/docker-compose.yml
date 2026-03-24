@@ -1,0 +1,22 @@
+
+services:
+  order-db:
+    image: mysql:8.4
+    container_name: ekart-order-db
+    ports:
+      - "3307:3306"
+    environment:
+      # Automatically creates the database on startup
+      - MYSQL_DATABASE=ekart_orderdb
+      # Root password for admin access
+      - MYSQL_ROOT_PASSWORD=root
+      # Dedicated app user for the Spring Boot service
+      - MYSQL_USER=ekart_user
+      - MYSQL_PASSWORD=ekart_pass
+    volumes:
+      - order_mysql_data:/var/lib/mysql
+
+
+
+volumes:
+  order_mysql_data:

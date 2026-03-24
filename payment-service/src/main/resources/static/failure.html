@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Payment Failed</title>
+  <style>
+    body { font-family: 'Segoe UI', sans-serif; text-align: center; padding: 50px; background-color: #fff5f5; }
+    .card { background: white; padding: 40px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); display: inline-block; }
+    .error-icon { font-size: 50px; color: #e74c3c; }
+    .btn { display: inline-block; margin-top: 20px; padding: 12px 24px; background: #e74c3c; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; }
+    .btn-secondary { background: #95a5a6; }
+    .order-info { color: #7f8c8d; margin-top: 15px; font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <div class="error-icon">✘</div>
+  <h1>Payment Failed</h1>
+  <p>We couldn't process your transaction at this time.</p>
+
+  <div id="orderContainer" class="order-info" style="display:none;">
+    Order ID: <span id="orderIdDisplay"></span>
+  </div>
+
+  <br>
+<!--  <a id="retryBtn" href="#" class="btn">Try Again</a>-->
+<!--  <br>-->
+  <a href="/index.html" class="btn btn-secondary" style="margin-top: 10px;">Back to Home</a>
+</div>
+
+<script>
+  const urlParams = new URLSearchParams(window.location.search);
+  const orderId = urlParams.get('orderId');
+
+  if (orderId) {
+      document.getElementById('orderContainer').style.display = 'block';
+      document.getElementById('orderIdDisplay').textContent = orderId;
+
+      // Link the retry button back to the payment page with the same orderId
+<!--      document.getElementById('retryBtn').href = `index.html?orderId=${orderId}`;-->
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+
+services:
+  inventory-db:
+    image: mysql:8.4
+    container_name: ekart-inventory-db
+    ports:
+      - "3308:3306"
+    environment:
+      # Automatically creates the database on startup
+      - MYSQL_DATABASE=ekartInventorydb
+      # Root password for admin access
+      - MYSQL_ROOT_PASSWORD=root
+      # Dedicated app user for the Spring Boot service
+      - MYSQL_USER=ekart_user_inventory
+      - MYSQL_PASSWORD=ekart_pass_inventory
+
+    volumes:
+      - inventory_mysql_data:/var/lib/mysql
+
+volumes:
+  inventory_mysql_data:
