@@ -2,11 +2,15 @@ package com.ekart.product_service.service;
 
 import com.ekart.product_service.dto.ProductRequest;
 import com.ekart.product_service.dto.ProductResponse;
+import com.ekart.product_service.exceptions.ProductNotFound;
 import com.ekart.product_service.model.Product;
 import com.ekart.product_service.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +24,9 @@ public class ProductService {
 
     private final ProductRepository productRepository;  // injecting this dependency using ProductService parameterized constructor
 
+
+    @CachePut(value = "products", key = "#result.id")
+    @CacheEvict(value = "products", key = "'all'")
     public ProductResponse createProduct(ProductRequest productRequest){
         Product product = Product.builder()
                 .name(productRequest.name())
@@ -31,6 +38,7 @@ public class ProductService {
         return new ProductResponse(product.getId(), product.getName(), product.getDescription(), product.getPrice());
     }
 
+    @Cacheable(value = "products", key = "'all'")
     public List<ProductResponse> getAllProducts(){
         return productRepository.findAll()
                 .stream()
@@ -38,14 +46,16 @@ public class ProductService {
                 .toList();
     }
 
+    @Cacheable(value = "products", key = "#id")
     public ProductResponse getProductbyId(String id) {
-        Product product = productRepository.findById(id).orElseThrow();
+        Product product = productRepository.findById(id).orElseThrow(() -> new ProductNotFound("Product not found with id: "+id));
         return new ProductResponse(product.getId(), product.getName(), product.getDescription(), product.getPrice());
     }
 
     @Transactional
+    @CachePut(value = "products", key = "#id")
     public ProductResponse updateProductById(String id, ProductRequest productRequest){
-        Product product = productRepository.findById(id).orElseThrow();
+        Product product = productRepository.findById(id).orElseThrow(() -> new ProductNotFound("Product not found with id: "+id));
         log.info("Product is found to update its value.");
         product.setName(productRequest.name());
         product.setDescription(productRequest.description());
@@ -58,9 +68,10 @@ public class ProductService {
         return new ProductResponse(product.getId(), product.getName(), product.getDescription(), product.getPrice());
     }
 
+    @CacheEvict(value = "products", key = "#id")
     public void deleteById(String id){
         if(!productRepository.existsById(id)){
-            throw new RuntimeException("Product doesn't exist.");
+            throw  new ProductNotFound("Product doesn't exist. with id: "+id);
         }
         productRepository.deleteById(id);
         log.info("Product deleted successfully.");

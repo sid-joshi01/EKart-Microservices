@@ -20,6 +20,10 @@ spring:
         defaultZone: http://localhost:8761/eureka
 
   data:
+    redis:
+      host: localhost   # if app runs outside Docker
+      port: 6379
+
     mongodb:
       uri: mongodb://localhost:27017/ekartproductdb
 

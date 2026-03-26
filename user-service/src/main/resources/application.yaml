@@ -54,4 +54,5 @@ spring:
             redirect-uri: "{baseUrl}/login/oauth2/code/google"
 
 
+
 #  docker exec -it ekart-user-db mysql -u root -p
